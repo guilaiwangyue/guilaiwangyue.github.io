@@ -926,39 +926,62 @@
     .todo-del:active { color: var(--danger); }
 
     .deadline-slider-wrap {
-      margin-bottom: 2px;
-    }
-    .deadline-slider-ticks {
       position: relative;
-      height: 14px;
-      margin: 0 10px;
+      height: 36px;
+      margin: 14px 0 6px;
     }
-    .deadline-slider-ticks span {
+    .deadline-slider-track {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 4px;
+      height: 28px;
+      border-radius: 14px;
+      background: var(--border);
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .deadline-slider-track .major {
       position: absolute;
       top: 0;
+      bottom: 0;
       transform: translateX(-50%);
-      font-size: 10px;
-      line-height: 14px;
+      font-size: 11px;
+      line-height: 28px;
       color: var(--text-secondary);
-      opacity: 0.6;
       white-space: nowrap;
       pointer-events: none;
-      left: 0;
+      user-select: none;
+      opacity: 0.85;
     }
-    .deadline-slider-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .deadline-slider-track .minor {
+      position: absolute;
+      top: 10px;
+      width: 1px;
+      height: 8px;
+      border-radius: 1px;
+      background: var(--text-secondary);
+      opacity: 0.25;
+      transform: translateX(-50%);
+      pointer-events: none;
     }
     .deadline-slider {
-      flex: 1;
+      position: absolute;
+      top: 4px;
+      left: 0;
+      width: 100%;
+      height: 28px;
+      margin: 0;
       -webkit-appearance: none;
       appearance: none;
-      height: 4px;
-      border-radius: 4px;
-      background: var(--border);
+      background: transparent;
       outline: none;
-      margin: 2px 10px 4px;
+    }
+    .deadline-slider::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 28px;
+      background: transparent;
+      border: none;
     }
     .deadline-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
@@ -966,10 +989,17 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
+      margin-top: 4px;
       background: var(--primary);
       border: 2px solid #fff;
       box-shadow: 0 1px 3px rgba(0,0,0,0.25);
       cursor: pointer;
+    }
+    .deadline-slider::-moz-range-track {
+      width: 100%;
+      height: 28px;
+      background: transparent;
+      border: none;
     }
     .deadline-slider::-moz-range-thumb {
       width: 20px;
@@ -979,17 +1009,6 @@
       border: 2px solid #fff;
       box-shadow: 0 1px 3px rgba(0,0,0,0.25);
       cursor: pointer;
-    }
-    .deadline-slider-label {
-      flex-shrink: 0;
-      min-width: 44px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--primary);
-      background: var(--primary-light);
-      border-radius: 8px;
-      padding: 5px 0;
     }
 
     /* 铃声选项按钮 */
@@ -3312,7 +3331,7 @@
       </div>
       <div class="setting-group" style="border-top:1px solid var(--border);padding-top:12px">
         <label>版本</label>
-        <div class="option-row" style="color:var(--text-secondary);font-size:13px">v127 · 2026-08-28（若此处不是 v127，请把页面从后台彻底关闭后重新打开）</div>
+        <div class="option-row" style="color:var(--text-secondary);font-size:13px">v128 · 2026-09-04（若此处不是 v128，请把页面从后台彻底关闭后重新打开）</div>
         <div class="option-row" style="color:var(--text-secondary);font-size:13px" id="launchModeRow">打开方式：检测中...</div>
         <div class="option-row" style="color:var(--text-secondary);font-size:12px;line-height:1.6" id="launchTipRow" hidden>提示：桌面图标方式受小米浏览器限制，插图片时可能弹不出相册。解决办法：① 用 Chrome 打开链接后「添加到主屏幕」；② 或直接在浏览器里打开链接使用。</div>
       </div>
@@ -3389,7 +3408,9 @@
       <button class="sheet-close" onclick="closeSheet('todoEditSheet')">&times;</button>
     </div>
     <div class="sheet-body" style="padding-bottom:10px">
-      <label class="sheet-label">标题</label>
+      <label class="sheet-label" style="display:flex;align-items:center;justify-content:space-between">标题
+        <span class="todo-plan-tag" id="todoEditPlanTag" onclick="toggleTodoEditPlan()">计划</span>
+      </label>
       <input type="text" class="sheet-input" id="todoEditTitle" placeholder="待办事项标题" maxlength="100">
       <label class="sheet-label" style="margin-top:6px">详细内容（可选）</label>
       <textarea class="sheet-textarea" id="todoEditContent" style="min-height:48px;padding:9px 11px" placeholder="补充说明..."></textarea>
@@ -3405,16 +3426,17 @@
         </button>
       </div>
       <div class="deadline-slider-wrap" style="margin-top:10px">
-        <div class="deadline-slider-ticks" id="deadlineSliderTicks">
-          <span data-day="0">今天</span>
-          <span data-day="2">2天</span>
-          <span data-day="4">4天</span>
-          <span data-day="6">6天</span>
+        <div class="deadline-slider-track" id="deadlineSliderTrack">
+          <span data-day="0" class="major">今天</span>
+          <span data-day="1" class="minor"></span>
+          <span data-day="2" class="major">2天</span>
+          <span data-day="3" class="minor"></span>
+          <span data-day="4" class="major">4天</span>
+          <span data-day="5" class="minor"></span>
+          <span data-day="6" class="major">6天</span>
+          <span data-day="7" class="minor"></span>
         </div>
-        <div class="deadline-slider-row">
-          <input type="range" class="deadline-slider" id="todoDeadlineSlider" min="0" max="7" step="1" value="0" oninput="setTodoDeadlineDays(this.value)">
-          <span class="deadline-slider-label" id="todoDeadlineSliderLabel">今天</span>
-        </div>
+        <input type="range" class="deadline-slider" id="todoDeadlineSlider" min="0" max="7" step="1" value="0" oninput="setTodoDeadlineDays(this.value)">
       </div>
       <div style="display:flex;gap:8px;margin-top:6px">
         <button class="btn-secondary" style="flex:1;padding:9px 0;font-size:14px" onclick="clearTodoDeadline()">清除时间设置</button>
@@ -4660,6 +4682,7 @@
     let editingTodoId = null;
     let pendingTodoData = null;
     let todoAlarmOn = false; // 编辑页闹钟开关状态
+    let todoPlanOn = false;  // 编辑页「计划」开关状态
     let todoEditOpenTs = 0; // 防止双击/双触重复打开编辑
 
     function openTodoEdit(id) {
@@ -4678,6 +4701,8 @@
       syncDeadlineSlider();
       todoAlarmOn = !!t.alarm;
       updateAlarmBtn();
+      todoPlanOn = !!t.planned;
+      updatePlanEditTag();
       openSheet('todoEditSheet');
       setTimeout(function() { document.getElementById('todoEditTitle').focus(); }, 300);
       setTimeout(positionDeadlineTicks, 50);
@@ -4694,6 +4719,8 @@
       syncDeadlineSlider();
       todoAlarmOn = false;
       updateAlarmBtn();
+      todoPlanOn = false;
+      updatePlanEditTag();
       openSheet('todoEditSheet');
       setTimeout(function() { document.getElementById('todoEditTitle').focus(); }, 300);
       setTimeout(positionDeadlineTicks, 50);
@@ -4714,6 +4741,16 @@
       if (btn) btn.classList.toggle('active', todoAlarmOn);
     }
 
+    function toggleTodoEditPlan() {
+      todoPlanOn = !todoPlanOn;
+      updatePlanEditTag();
+    }
+
+    function updatePlanEditTag() {
+      const tag = document.getElementById('todoEditPlanTag');
+      if (tag) tag.classList.toggle('on', todoPlanOn);
+    }
+
     function setTodoDeadline(days) {
       document.getElementById('todoEditDeadline').value = isoAddDays(getTodayISO(), days);
     }
@@ -4721,22 +4758,19 @@
     function setTodoDeadlineDays(val) {
       const days = parseInt(val, 10) || 0;
       const dl = document.getElementById('todoEditDeadline');
-      const lbl = document.getElementById('todoDeadlineSliderLabel');
       const slider = document.getElementById('todoDeadlineSlider');
       if (slider && slider.value !== String(days)) slider.value = String(days);
       dl.value = isoAddDays(getTodayISO(), days);
-      lbl.textContent = days === 0 ? '今天' : (days + '天后');
     }
 
     function positionDeadlineTicks() {
       const slider = document.getElementById('todoDeadlineSlider');
-      const ticks = document.getElementById('deadlineSliderTicks');
-      if (!slider || !ticks) return;
-      const rect = slider.getBoundingClientRect();
+      const track = document.getElementById('deadlineSliderTrack');
+      if (!slider || !track) return;
       const w = slider.clientWidth;
       const thumb = 20; // 与圆点直径一致
       const span = w - thumb; // 圆点实际滑动范围
-      const spans = ticks.querySelectorAll('span');
+      const spans = track.querySelectorAll('span');
       spans.forEach(function(s) {
         const day = parseInt(s.getAttribute('data-day'), 10);
         const ratio = day / 7;
@@ -4749,7 +4783,6 @@
     function syncDeadlineSlider() {
       const dl = document.getElementById('todoEditDeadline');
       const slider = document.getElementById('todoDeadlineSlider');
-      const lbl = document.getElementById('todoDeadlineSliderLabel');
       const today = getTodayISO();
       let days = 0;
       if (dl.value) {
@@ -4757,7 +4790,6 @@
         if (diff >= 0 && diff <= 7) days = diff;
       }
       slider.value = String(days);
-      lbl.textContent = days === 0 ? '今天' : (days + '天后');
     }
 
     function saveTodoEdit() {
@@ -4775,16 +4807,17 @@
         var t = getTodoById(editingTodoId);
         if (t) {
           if (t.deadline !== dl || t.time !== tm || t.alarm !== todoAlarmOn) t.alarmFired = false;
-          t.title = title; t.content = content; t.deadline = dl; t.time = tm; t.alarm = todoAlarmOn;
+          t.title = title; t.content = content; t.deadline = dl; t.time = tm; t.alarm = todoAlarmOn; t.planned = todoPlanOn;
         }
       } else {
-        db.todos.push({ id: 't' + Date.now() + Math.floor(Math.random()*1000), title: title, content: content, done: false, created: Date.now(), completedAt: 0, deadline: dl, time: tm, alarm: todoAlarmOn, alarmFired: false });
+        db.todos.push({ id: 't' + Date.now() + Math.floor(Math.random()*1000), title: title, content: content, done: false, created: Date.now(), completedAt: 0, deadline: dl, time: tm, alarm: todoAlarmOn, alarmFired: false, planned: todoPlanOn });
       }
       saveDB();
       closeSheet('todoEditSheet');
       editingTodoId = null;
       pendingTodoData = null;
       todoAlarmOn = false;
+      todoPlanOn = false;
       renderTodoTab();
       showToast('已保存');
     }
