@@ -927,55 +927,50 @@
 
     .deadline-slider-wrap {
       position: relative;
-      height: 44px;
+      height: 36px;
       margin: 14px 0 6px;
     }
     .deadline-slider-track {
       position: absolute;
       left: 0;
       right: 0;
-      top: 7px;
-      height: 6px;
-      border-radius: 3px;
-      background: rgba(140,140,140,0.35);
+      top: 4px;
+      height: 28px;
+      border-radius: 14px;
+      background: var(--border);
+      overflow: hidden;
       pointer-events: none;
     }
-    .deadline-slider-scale {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 19px;
-      height: 22px;
-      pointer-events: none;
-    }
-    .deadline-slider-scale .major {
+    .deadline-slider-track .major {
       position: absolute;
       top: 0;
+      bottom: 0;
       transform: translateX(-50%);
       font-size: 11px;
-      line-height: 22px;
+      line-height: 28px;
       color: var(--text-secondary);
       white-space: nowrap;
       pointer-events: none;
       user-select: none;
+      opacity: 0.85;
     }
-    .deadline-slider-scale .minor {
+    .deadline-slider-track .minor {
       position: absolute;
-      top: 3px;
+      top: 10px;
       width: 1px;
-      height: 7px;
+      height: 8px;
       border-radius: 1px;
       background: var(--text-secondary);
-      opacity: 0.35;
+      opacity: 0.25;
       transform: translateX(-50%);
       pointer-events: none;
     }
     .deadline-slider {
       position: absolute;
-      top: 7px;
+      top: 4px;
       left: 0;
       width: 100%;
-      height: 20px;
+      height: 28px;
       margin: 0;
       -webkit-appearance: none;
       appearance: none;
@@ -984,35 +979,39 @@
     }
     .deadline-slider::-webkit-slider-runnable-track {
       width: 100%;
-      height: 20px;
+      height: 28px;
       background: transparent;
       border: none;
     }
+    /* 滑块：横向半透明小胶囊，高度贴合 28px 滑轨，可透出后面刻度 */
     .deadline-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      margin-top: 0;
+      width: 40px;
+      height: 24px;
+      border-radius: 12px;
+      margin-top: 2px;
       background: var(--primary);
-      border: 2px solid #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+      background: color-mix(in srgb, var(--primary) 45%, transparent);
+      border: 1.5px solid color-mix(in srgb, var(--primary) 75%, transparent);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       cursor: pointer;
     }
     .deadline-slider::-moz-range-track {
       width: 100%;
-      height: 20px;
+      height: 28px;
       background: transparent;
       border: none;
     }
     .deadline-slider::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
+      width: 40px;
+      height: 24px;
+      border-radius: 12px;
+      margin-top: 0;
       background: var(--primary);
-      border: 2px solid #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+      background: color-mix(in srgb, var(--primary) 45%, transparent);
+      border: 1.5px solid color-mix(in srgb, var(--primary) 75%, transparent);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       cursor: pointer;
     }
 
@@ -3336,7 +3335,7 @@
       </div>
       <div class="setting-group" style="border-top:1px solid var(--border);padding-top:12px">
         <label>版本</label>
-        <div class="option-row" style="color:var(--text-secondary);font-size:13px">v129 · 2026-09-04（若此处不是 v129，请把页面从后台彻底关闭后重新打开）</div>
+        <div class="option-row" style="color:var(--text-secondary);font-size:13px">v130 · 2026-09-04（若此处不是 v130，请把页面从后台彻底关闭后重新打开）</div>
         <div class="option-row" style="color:var(--text-secondary);font-size:13px" id="launchModeRow">打开方式：检测中...</div>
         <div class="option-row" style="color:var(--text-secondary);font-size:12px;line-height:1.6" id="launchTipRow" hidden>提示：桌面图标方式受小米浏览器限制，插图片时可能弹不出相册。解决办法：① 用 Chrome 打开链接后「添加到主屏幕」；② 或直接在浏览器里打开链接使用。</div>
       </div>
@@ -3431,8 +3430,7 @@
         </button>
       </div>
       <div class="deadline-slider-wrap" style="margin-top:10px">
-        <div class="deadline-slider-track"></div>
-        <div class="deadline-slider-scale" id="deadlineSliderScale">
+        <div class="deadline-slider-track" id="deadlineSliderTrack">
           <span data-day="0" class="major">今天</span>
           <span data-day="1" class="minor"></span>
           <span data-day="2" class="major">2天</span>
@@ -4771,16 +4769,16 @@
 
     function positionDeadlineTicks() {
       const slider = document.getElementById('todoDeadlineSlider');
-      const scale = document.getElementById('deadlineSliderScale');
-      if (!slider || !scale) return;
+      const track = document.getElementById('deadlineSliderTrack');
+      if (!slider || !track) return;
       const w = slider.clientWidth;
-      const thumb = 20; // 与圆点直径一致
-      const span = w - thumb; // 圆点实际滑动范围
-      const spans = scale.querySelectorAll('span');
+      const thumb = 40; // 与横向胶囊滑块宽度一致
+      const span = w - thumb; // 滑块实际滑动范围
+      const spans = track.querySelectorAll('span');
       spans.forEach(function(s) {
         const day = parseInt(s.getAttribute('data-day'), 10);
         const ratio = day / 7;
-        const left = thumb / 2 + ratio * span; // 圆点中心位置
+        const left = thumb / 2 + ratio * span; // 滑块中心位置
         s.style.left = left + 'px';
       });
     }
