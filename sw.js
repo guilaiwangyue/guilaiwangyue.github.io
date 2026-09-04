@@ -1,4 +1,4 @@
-const CACHE_NAME = 'work-daily-report-v129';
+const CACHE_NAME = 'work-daily-report-v130';
 const ASSETS = [
   './',
   './index.html',
