@@ -927,50 +927,55 @@
 
     .deadline-slider-wrap {
       position: relative;
-      height: 36px;
+      height: 44px;
       margin: 14px 0 6px;
     }
     .deadline-slider-track {
       position: absolute;
       left: 0;
       right: 0;
-      top: 4px;
-      height: 28px;
-      border-radius: 14px;
-      background: var(--border);
-      overflow: hidden;
+      top: 7px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(140,140,140,0.35);
       pointer-events: none;
     }
-    .deadline-slider-track .major {
+    .deadline-slider-scale {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 19px;
+      height: 22px;
+      pointer-events: none;
+    }
+    .deadline-slider-scale .major {
       position: absolute;
       top: 0;
-      bottom: 0;
       transform: translateX(-50%);
       font-size: 11px;
-      line-height: 28px;
+      line-height: 22px;
       color: var(--text-secondary);
       white-space: nowrap;
       pointer-events: none;
       user-select: none;
-      opacity: 0.85;
     }
-    .deadline-slider-track .minor {
+    .deadline-slider-scale .minor {
       position: absolute;
-      top: 10px;
+      top: 3px;
       width: 1px;
-      height: 8px;
+      height: 7px;
       border-radius: 1px;
       background: var(--text-secondary);
-      opacity: 0.25;
+      opacity: 0.35;
       transform: translateX(-50%);
       pointer-events: none;
     }
     .deadline-slider {
       position: absolute;
-      top: 4px;
+      top: 7px;
       left: 0;
       width: 100%;
-      height: 28px;
+      height: 20px;
       margin: 0;
       -webkit-appearance: none;
       appearance: none;
@@ -979,7 +984,7 @@
     }
     .deadline-slider::-webkit-slider-runnable-track {
       width: 100%;
-      height: 28px;
+      height: 20px;
       background: transparent;
       border: none;
     }
@@ -989,7 +994,7 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      margin-top: 4px;
+      margin-top: 0;
       background: var(--primary);
       border: 2px solid #fff;
       box-shadow: 0 1px 3px rgba(0,0,0,0.25);
@@ -997,7 +1002,7 @@
     }
     .deadline-slider::-moz-range-track {
       width: 100%;
-      height: 28px;
+      height: 20px;
       background: transparent;
       border: none;
     }
@@ -3331,7 +3336,7 @@
       </div>
       <div class="setting-group" style="border-top:1px solid var(--border);padding-top:12px">
         <label>版本</label>
-        <div class="option-row" style="color:var(--text-secondary);font-size:13px">v128 · 2026-09-04（若此处不是 v128，请把页面从后台彻底关闭后重新打开）</div>
+        <div class="option-row" style="color:var(--text-secondary);font-size:13px">v129 · 2026-09-04（若此处不是 v129，请把页面从后台彻底关闭后重新打开）</div>
         <div class="option-row" style="color:var(--text-secondary);font-size:13px" id="launchModeRow">打开方式：检测中...</div>
         <div class="option-row" style="color:var(--text-secondary);font-size:12px;line-height:1.6" id="launchTipRow" hidden>提示：桌面图标方式受小米浏览器限制，插图片时可能弹不出相册。解决办法：① 用 Chrome 打开链接后「添加到主屏幕」；② 或直接在浏览器里打开链接使用。</div>
       </div>
@@ -3408,7 +3413,7 @@
       <button class="sheet-close" onclick="closeSheet('todoEditSheet')">&times;</button>
     </div>
     <div class="sheet-body" style="padding-bottom:10px">
-      <label class="sheet-label" style="display:flex;align-items:center;justify-content:space-between">标题
+      <label class="sheet-label" style="display:flex;align-items:center;gap:8px">标题
         <span class="todo-plan-tag" id="todoEditPlanTag" onclick="toggleTodoEditPlan()">计划</span>
       </label>
       <input type="text" class="sheet-input" id="todoEditTitle" placeholder="待办事项标题" maxlength="100">
@@ -3426,7 +3431,8 @@
         </button>
       </div>
       <div class="deadline-slider-wrap" style="margin-top:10px">
-        <div class="deadline-slider-track" id="deadlineSliderTrack">
+        <div class="deadline-slider-track"></div>
+        <div class="deadline-slider-scale" id="deadlineSliderScale">
           <span data-day="0" class="major">今天</span>
           <span data-day="1" class="minor"></span>
           <span data-day="2" class="major">2天</span>
@@ -4765,12 +4771,12 @@
 
     function positionDeadlineTicks() {
       const slider = document.getElementById('todoDeadlineSlider');
-      const track = document.getElementById('deadlineSliderTrack');
-      if (!slider || !track) return;
+      const scale = document.getElementById('deadlineSliderScale');
+      if (!slider || !scale) return;
       const w = slider.clientWidth;
       const thumb = 20; // 与圆点直径一致
       const span = w - thumb; // 圆点实际滑动范围
-      const spans = track.querySelectorAll('span');
+      const spans = scale.querySelectorAll('span');
       spans.forEach(function(s) {
         const day = parseInt(s.getAttribute('data-day'), 10);
         const ratio = day / 7;
